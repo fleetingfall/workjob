@@ -1,5 +1,4 @@
-package scala
-
+package scala.`implicit`
 
 object ImplicitDemo2 {
   object Context{

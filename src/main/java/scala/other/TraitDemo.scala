@@ -1,4 +1,4 @@
-package scala
+package scala.other
 
 /*
 * Trait可以被作为接口来使用，此时Trait与Java的接口非常类似。同时在Trait可以定义抽象方法，其与抽象类中的抽象方法一样

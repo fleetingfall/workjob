@@ -1,4 +1,4 @@
-package scala
+package scala.other
 
 class CassDemo {
 
