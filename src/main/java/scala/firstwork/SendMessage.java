@@ -16,30 +16,29 @@ import java.util.UUID;
 public class SendMessage {
     public static Random rand=new Random();
     public static String[] hostname={"192.168.37.129","110.110.110.110","255.255.110.123","102.10.101.10","10.10.10.110"};
+
     public static void main(String[] args) {
        sendMessage();
 
     }
 
     public static void sendMessage(){
-        KafkaProducer<String,String> producer=KafkaUtil.getProducer("localhost",9092);
+        KafkaProducer<String,String> producer=KafkaUtil.getProducer("master",9092);
         int cnt=1;
         System.out.println("=========================即将发送消息==========================");
-        while (cnt<10000){
+        while (true){
             //消息躰,record的构造方法开可以再加一个参数，也就是第二个，是分区。
             String value=createMessage();
-            ProducerRecord<String,String> message=new ProducerRecord<>("kingcall",String.valueOf(cnt),value);
+            ProducerRecord<String,String> message=new ProducerRecord<>("longzhuresty",String.valueOf(cnt),value);
             producer.send(message);
             System.out.println("消息已经被发送:"+cnt+"------>"+value);
-
             try {
-                Thread.sleep(1000*1);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
             cnt++;
         }
-        System.out.println("==============================消息发送完毕==========================");
     }
     /*
     x_forwarded_for     	string              	客户端IP

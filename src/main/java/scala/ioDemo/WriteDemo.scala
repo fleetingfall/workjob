@@ -32,7 +32,10 @@ object WriteDemo {
   }
 
   def main(args: Array[String]): Unit = {
-    read2
+    val fileout:PrintWriter=new PrintWriter("C:\\Users\\PLUSH80702\\Desktop\\receive\\3.txt")
+    fileout.println("hello")
+    fileout.flush()
+    fileout.close()
   }
 
 }

@@ -21,9 +21,29 @@ object TraitDemo {
     }
   }
 
+  trait ConsoleLogger{
+    def log(msg:String): Unit ={
+      println()
+      println("特质"+msg)
+    }
+  }
+
+  object savelog extends ConsoleLogger{
+    override def log(msg: String): Unit = {
+      super.log(msg)
+      println("子类"+msg
+      )
+    }
+    def logsave(msg:String): Unit ={
+      log(msg)
+    }
+  }
+
   def main(args: Array[String]): Unit = {
     TestTrait.makeFriends("kingcall")
     TestTrait.makeGun("kingcall")
+
+    savelog.log("Hello KingCall")
   }
 
 }
