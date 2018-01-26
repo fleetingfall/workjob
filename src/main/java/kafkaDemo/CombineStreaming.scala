@@ -10,7 +10,6 @@ import org.apache.spark.streaming.{Seconds, StreamingContext}
 
 object CombineStreaming {
   def main(args: Array[String]): Unit = {
-    val list=new util.ArrayList[String]()
     val conf=new SparkConf().setAppName("TEst").setMaster("local[2]")
     val sc=new StreamingContext(conf,Seconds(2))
     val inputrdd=KafkaUtils.createStream(sc,"10.53.1.30:2181","kk",Map("kingcall"->1))

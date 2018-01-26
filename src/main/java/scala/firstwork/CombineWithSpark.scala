@@ -37,7 +37,7 @@ object CombineWithSpark {
 
     /*对接收到的数据进行判断处理  新的问题spark中流处理到底是从哪里开始循环的     发现这个方法只被调用了一次*/
 
-    val path:String=SaveToHDFS.createFolderAndGetPath()
+   /* val path:String=SaveToHDFS.createFolderAndGetPath()*/
 
     inputRdd.foreachRDD(rdd=>{
       if (rdd.count()>0){
@@ -48,13 +48,13 @@ object CombineWithSpark {
           name=tmpobj.get("host")+""
           println("---------------"+name)
           var conetxt:String=tmpobj.get("client_ip")+"\t"+tmpobj.get("is_blocked")+"\t"+tmpobj.get("args")+"\t"+tmpobj.get("status")+"\t"+tmpobj.get("uid")+"\t"+name+"\r\n"
-          SaveToHDFS.saveFile(path,conetxt,name)
+          SaveToLocal.saveFile(SaveToLocal.createFolderAndGetPath,conetxt,name)
+          tmpobj
         })
       }
     })
-
-
+    /*inputRdd.repartition(1).saveAsTextFiles("C:\\Users\\PLUSH80702\\Desktop\\receive\\")*/
     scc.start()
-    scc.awaitTermination()
+   scc.awaitTermination()
   }
 }

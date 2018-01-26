@@ -46,9 +46,8 @@ object SaveToLocal {
     * @return 完整的文件路径
     */
   def createFolderAndGetPath():String={
-    println(" |----------------------------创建文件夹的方法被调用------------------------------|")
     val path=basepath+getTimePath()
-    new File(path).mkdirs()
+   /* new File(path).mkdirs() 可以不要了，因为在后面还有创建文件夹，可以一次性创建*/
     path
 }
 
@@ -81,6 +80,6 @@ object SaveToLocal {
     inputStream.saveAsTextFiles("C:\\Users\\PLUSH80702\\Desktop\\receive\\")
     /*支持在本地运行然后存储到hdfs上去*/
     inputStream.saveAsHadoopFiles("hdfs://master:9000/lz/firstjob","",classOf[Text],classOf[Text],classOf[TextOutputFormat[Text,Text]])
-    /*保存结束之后应该合并文件夹里面的零散文件*/
+    /*保存结束之后应该合并文件夹里面的零散文件  对于有多个小文件应该借助inputRdd.repartition(1).saveAsTextFiles() 先合并分区，然后再去存储*/
   }
 }
