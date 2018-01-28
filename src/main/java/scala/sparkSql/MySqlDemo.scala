@@ -2,7 +2,7 @@ package scala.sparkSql
 
 import java.util.Properties
 
-import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
+import org.apache.spark.sql.{DataFrame, Dataset, SaveMode, SparkSession}
 
 import scala.sparkSql.BaseDemo.{mysqlConf, result}
 
@@ -12,7 +12,7 @@ object MySqlDemo {
   mysqlConf.setProperty("user", "root")
   mysqlConf.setProperty("password", "www1234")
   val sparkSession:SparkSession=SparkSession.builder().appName("Base Demo").master("local[2]").getOrCreate()
-  val url="jdbc:mysql://localhost:3306/kingcall?&serverTimezone=UTC&characterEncoding=utf8"
+  val url="jdbc:mysql://slave1:3306/kingcall?&serverTimezone=UTC&characterEncoding=utf8"
 
 
 
@@ -27,9 +27,9 @@ object MySqlDemo {
     df
   }
 
-  def writeToMysql(resultdataFrame: DataFrame,sparkSession:SparkSession,url:String,tablename:String,mysqlConf:Properties): Unit ={
-    println("不覆盖的添加方法被执行")
-    resultdataFrame.write.mode(SaveMode.Overwrite).jdbc(url,tablename, mysqlConf)
+  def writeToMysql(resultdataFrame: DataFrame,tablename:String,sparkSession:SparkSession=sparkSession,url:String=url,mysqlConf:Properties=mysqlConf): Unit ={
+    val p=resultdataFrame.write.mode(SaveMode.Append).jdbc(url,tablename, mysqlConf)
+    println(p)
 
   }
   def executeQuery(queryDataFrame:DataFrame,sparkSession:SparkSession,sql:String,viewName:String): DataFrame ={

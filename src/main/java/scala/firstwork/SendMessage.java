@@ -33,7 +33,7 @@ public class SendMessage {
             producer.send(message);
             System.out.println("消息已经被发送:"+cnt+"------>"+value);
             try {
-                Thread.sleep(100);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
