@@ -121,9 +121,8 @@ object DateUtil {
     return yesterday
   }
 
-  def main(args: Array[String]) {
-    println("现在的日期是: "+getDateNow())
-    println("昨天的日期是:"+getYesterday())
+  def main(args: Array[String]): Unit = {
+    print(new Date("2018-01-25").getTime)
   }
 
 }

@@ -1,21 +1,26 @@
-package scala.sparkSql
+package scala.firstwork
 
 import com.alibaba.fastjson.JSON
-import org.apache.spark.SparkConf
-import org.apache.spark.sql.{DataFrame, SQLContext, SparkSession}
+import kafka.serializer.StringDecoder
+import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 import org.apache.spark.streaming.kafka.KafkaUtils
 
-case class Bean(client_ip:String,is_blocked:String,args:String,status:String,uid:String,host:String)
+import scala.sparkSql.{Bean, MySqlDemo}
 
-object streamingDemo {
-
+/**
+  * 采取Spark-Streaming和Kafka直连的方式,但是不知道为什么要等很久才可以获取到数据（相比另一种对接的方式），
+  */
+object CombineStreamingSQL {
   def main(args: Array[String]): Unit = {
     val sparkSession:SparkSession=SparkSession.builder().appName("Base Demo").master("local[2]").getOrCreate()
     val scc=new StreamingContext(sparkSession.sparkContext,Seconds(2))
-    val zkQuorum="10.52.7.20:2181,10.52.7.21:2181,10.52.7.22:2181,master:2181"
+    val kafkaParams = Map(
+      "metadata.broker.list" -> "192.168.9.161:9092,192.168.9.162:9092,192.168.9.163:9092,192.168.9.164:9092,192.168.9.165:9092,master:9092"
+    )
+    val topics = Set("longzhuresty")
     /*查没有过期的用法是什么*/
-    val inputrdd=KafkaUtils.createStream(scc,zkQuorum,"kk",Map("longzhuresty"->1))
+    val inputrdd=KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](scc,kafkaParams,topics )
     val SQLContext=sparkSession.sqlContext
     import SQLContext.implicits._
     /*发送过来的数据是 k-v 形式的      你是将RDD转换成DF的，而不是输入流          toDF()方法的参数是重新起列的名字吗*/
@@ -35,4 +40,5 @@ object streamingDemo {
     scc.start()
     scc.awaitTermination()
   }
+
 }

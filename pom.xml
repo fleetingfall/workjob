@@ -88,7 +88,12 @@
             <artifactId>spark-streaming_${tmp.version}</artifactId>
             <version>${spark.version}</version>
         </dependency>
-
+        <!--kafka-->
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka-log4j-appender</artifactId>
+            <version>1.0.0</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.kafka</groupId>
             <artifactId>kafka-clients</artifactId>

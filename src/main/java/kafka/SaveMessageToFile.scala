@@ -1,4 +1,4 @@
-package kafkaDemo
+package kafka
 
 import java.io.{File, FileWriter, PrintWriter}
 import java.util
