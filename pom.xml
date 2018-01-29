@@ -33,11 +33,11 @@
             <artifactId>hadoop-common</artifactId>
             <version>2.7.2</version>
         </dependency>
-        <dependency>
+       <!-- <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-mapreduce-client</artifactId>
             <version>2.7.2</version>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-mapreduce-client-core</artifactId>
@@ -164,7 +164,7 @@
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <manifestEntries>
                                         <!-- 配置main函数-->
-                                        <Main-Class>scala.firstwork.CombineWithSpark</Main-Class>
+                                        <Main-Class>kafkaDemo.twoMethod.DirectMethod</Main-Class>
                                     </manifestEntries>
                                 </transformer>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
