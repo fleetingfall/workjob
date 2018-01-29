@@ -25,8 +25,11 @@ import scala.util.DateUtil
 object BaseSQL {
   def main(args: Array[String]): Unit = {
     val sparksession=SparkSession.builder().appName("Test").master("local[2]").getOrCreate()
-    WithTime(sparksession)
+    splitstr(sparksession)
+  }
 
+  def splitstr(sparksession:SparkSession): Unit ={
+    sparksession.sql("select split('trtre:23424:4343:343:sdffsd', ':')[2]").show()
   }
 
   /**
