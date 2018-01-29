@@ -19,7 +19,7 @@
     <orderEntry type="module-library">
       <library name="Maven: jdk.tools:jdk.tools:1.8">
         <CLASSES>
-          <root url="jar://D:/workingsoft/java/jdk/lib/tools.jar!/" />
+          <root url="jar://D:/workingsoft/Java/jdk8/lib/tools.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -223,6 +223,7 @@
     <orderEntry type="library" name="Maven: org.scala-lang.modules:scala-parser-combinators_2.11:1.0.2" level="project" />
     <orderEntry type="library" name="Maven: com.101tec:zkclient:0.3" level="project" />
     <orderEntry type="library" name="Maven: org.apache.spark:spark-streaming_2.11:2.0.2" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.kafka:kafka-log4j-appender:1.0.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.kafka:kafka-clients:1.0.0" level="project" />
     <orderEntry type="library" name="Maven: org.lz4:lz4-java:1.4" level="project" />
   </component>

@@ -1,6 +1,6 @@
-package kafkaDemo.twoMethod
+package kafka
 
-import java.util.{Date, Properties}
+import java.util.Properties
 
 import com.alibaba.fastjson.JSON
 import kafka.serializer.StringDecoder
