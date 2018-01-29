@@ -53,6 +53,7 @@ object CombineWithSpark {
         })
       }
     })
+    /*可以避免一个RDD有多个分区，有合并分区的意思*/
     /*inputRdd.repartition(1).saveAsTextFiles("C:\\Users\\PLUSH80702\\Desktop\\receive\\")*/
     scc.start()
    scc.awaitTermination()
