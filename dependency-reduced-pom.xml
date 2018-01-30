@@ -60,7 +60,7 @@
                 </transformer>
                 <transformer>
                   <manifestEntries>
-                    <Main-Class>kafka.DirectMethod</Main-Class>
+                    <Main-Class>kafka.test</Main-Class>
                   </manifestEntries>
                 </transformer>
                 <transformer>

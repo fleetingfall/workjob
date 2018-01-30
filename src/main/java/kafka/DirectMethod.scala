@@ -122,6 +122,6 @@ object DirectMethod {
     val p=JSON.parseObject(str.replace("message:",""))
     val s1:String=p.get("chat").toString.replaceAll("['\\[' '\\]']","")
     val s2:String=p.get("other").toString.replaceAll("['\\[' '\\]']","")
-    (chat,other)
+    (s1,s2)
   }
 }
