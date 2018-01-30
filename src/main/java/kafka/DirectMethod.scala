@@ -71,8 +71,7 @@ object DirectMethod {
         ).toDF("send_count","uid","room_id","el","ea","ec","tid","chat_str","others_str").createOrReplaceTempView("danmu")
         val result:DataFrame=sparkSession.sql(
           s"""
-             |select
-             |    '${time}' as timestamp,
+            select
              |    room_id, rtype,
              |    sum(lag_3_cnt) as lag_3_cnt,
              |    sum(lag_5_cnt) as lag_5_cnt,
@@ -95,12 +94,7 @@ object DirectMethod {
              |        cast(chat_list[3] as int) as lag_15_cnt,
              |        cast(chat_list[4] as int) as lag_30_cnt,
              |        cast(chat_list[5] as int) as lag_30_plus_cnt
-             |    from (
-             |        select
-             |            room_id, 'chat' as rtype, uid, split('chat_str', ',') as chat_list
-             |        from danmu
-             |        where size(split('chat_str', ',')) = 6
-             |    ) r
+             |    from (select room_id, 'chat' as rtype, uid, split(chat_str, ',') as chat_list from tmp where size(split(chat_str, ',')) = 6) r
              |    union all
              |    select
              |        room_id, 'others' as rtype, uid,
@@ -110,12 +104,7 @@ object DirectMethod {
              |        cast(others_list[3] as int) as lag_15_cnt,
              |        cast(others_list[4] as int) as lag_30_cnt,
              |        cast(others_list[5] as int) as lag_30_plus_cnt
-             |    from (
-             |        select
-             |            room_id, 'others' as rtype, uid, split('others_str', ',') as others_list
-             |        from tmp
-             |        where size(split('others_str', ',')) = 6
-             |    ) r
+             |    from (select room_id, 'others' as rtype, uid, split(others_str, ',') as others_list from tmp where size(split(others_str, ',')) = 6 ) r
              |) s
              |group by room_id, rtype
              |;
