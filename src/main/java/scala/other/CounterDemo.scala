@@ -24,14 +24,14 @@ object CounterDemo {
   }
   /* 第一中定义累加器的方法已经被淘汰*/
   def Accu2(): Unit ={
-    val acc = new LongAccumulator
+ /*   val acc = new LongAccumulator
     register(acc, "blankLines")
     file.foreach(line => {
       if(line != ""){
         blankLines += 1
       }
     })
-    println(blankLines.value)
+    println(blankLines.value)*/
 
   }
 }

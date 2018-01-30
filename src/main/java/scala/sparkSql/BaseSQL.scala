@@ -2,6 +2,7 @@ package scala.sparkSql
 
 import java.text.SimpleDateFormat
 
+import com.alibaba.fastjson.JSON
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
 import scala.util.DateUtil
@@ -23,13 +24,33 @@ import scala.util.DateUtil
 
   */
 object BaseSQL {
+  val sparksession=SparkSession.builder().appName("Test").master("local[2]").enableHiveSupport().getOrCreate()
   def main(args: Array[String]): Unit = {
-    val sparksession=SparkSession.builder().appName("Test").master("local[2]").getOrCreate()
-    splitstr(sparksession)
+
+    test()
   }
 
+
+  def test(): Unit={
+    val str="""message:{"chat":[22,0,0,0,0],"other":[50,0,0,0,0]}"""
+    val p=JSON.parseObject(str.replace("message:",""))
+    val s1:String=p.get("chat").toString.replaceAll("['\\[' '\\]']","")
+    val s2:String=p.get("other").toString.replaceAll("['\\[' '\\]']","")
+    println(s1)
+    println(s2)
+  }
+
+  /*
+  * 这是一个标准的字符串处理函数，可以让你向使用java一样使用
+  *  sparksession.sql("select split('trtre:23424:4343:343:sdffsd', ':')[2]").show()
+  * */
   def splitstr(sparksession:SparkSession): Unit ={
-    sparksession.sql("select split('trtre:23424:4343:343:sdffsd', ':')[2]").show()
+    val p="message:{'chat':[22,0,0,0,0],'other':[50,0,0,0,0]}"
+   /* select substring(split(split(split("${p}",':')[2],',')[0],']')[0],2)*/
+    val sqlstr=s"""
+      |select substring(split(split(split("${p}",':')[2],',')[0],']')[0],2) as chat,split(substring(regexp_replace(split("${p}",':')[3],"}",''),2),',')[0] as other
+      """.stripMargin
+    sparksession.sql(sqlstr).show()
   }
 
   /**
@@ -79,7 +100,7 @@ object BaseSQL {
   }
 
   /*
-  * 在sql语句中引入外部变量,例如时间
+  * 在sql语句中引入外部变量,例如时间,注意你什么时候该用单引号，什么时候该用双引号
   * */
   def test1(sparksession:SparkSession): Unit ={
     val time=DateUtil.getDateNow()
