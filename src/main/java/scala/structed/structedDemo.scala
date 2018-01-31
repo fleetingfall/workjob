@@ -1,7 +1,5 @@
 package scala.structed
 
-import kafka.DirectMethod.sparkConf
-
 object structedDemo {
   /*
   * Structured Streaming （结构化流）是一种基于 Spark SQL 引擎构建的可扩展且容错的 stream processing engine （流处理引擎）

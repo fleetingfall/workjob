@@ -12,7 +12,7 @@ import org.apache.spark.streaming.{Seconds, StreamingContext}
 
 object DirectMethod {
 
-  case class Bean(send_count:Int,uid:Int,s_path:String,el:String,ea:String,ec:String,tid:String,chat:String,other:String)
+  case class Bean(isp:String,province:String,uid:Int,s_path:String,chat:String,other:String)
   val sparkConf = new SparkConf().set("spark.testing.memory", "2147480000")
   /*SparkSession
   * Spark2.0中引入了SparkSession的概念，它为用户提供了一个统一的切入点来使用Spark的各项功能，以前需要sparkConf--->SparkContext--->sqlContext
@@ -57,22 +57,19 @@ object DirectMethod {
         }
         ).map(x=>{
           val tmpobj=JSON.parseObject(x._2)
-          val send_count:Int=tmpobj.getIntValue("_s")//发送次数
+          val isp:String=tmpobj.getString("isp")
+          val province:String=tmpobj.getString("province")
           val uid:Int=tmpobj.getIntValue("uid") //用户id
           val s_path:String=tmpobj.getString("s_path")//url路径
           val el:String=tmpobj.getString("el")//事件key
-          val ea:String=tmpobj.getString("ea")//事件行为
-          val s_timestamp:Int=tmpobj.getString("s_ts").toInt//上报时间
-          val ec=tmpobj.getString("ec")//事件类别
-          val tid=tmpobj.getString("tid")
           val tuples=dataPrepare(el)
-          Bean(send_count,uid,s_path,el,ea,ec,tid,tuples._1,tuples._2)
+          Bean(isp,province,uid,s_path,tuples._1,tuples._2)
         }
-        ).toDF("send_count","uid","room_id","el","ea","ec","tid","chat_str","others_str").createOrReplaceTempView("danmu")
+        ).toDF("isp","province","uid","room_id","chat_str","others_str").createOrReplaceTempView("tmp")
         val result:DataFrame=sparkSession.sql(
           s"""
             select
-             |    room_id, rtype,
+             |    '${time}' as time,isp,province,room_id, rtype,
              |    sum(lag_3_cnt) as lag_3_cnt,
              |    sum(lag_5_cnt) as lag_5_cnt,
              |    sum(lag_10_cnt) as lag_10_cnt,
@@ -87,31 +84,31 @@ object DirectMethod {
              |    count(distinct if(lag_30_plus_cnt > 0, uid, null)) as lag_30_plus_user
              |from(
              |    select
-             |        room_id, 'chat' as rtype, uid,
+             |        isp,province,room_id, 'chat' as rtype, uid,
              |        cast(chat_list[0] as int) as lag_3_cnt,
              |        cast(chat_list[1] as int) as lag_5_cnt,
              |        cast(chat_list[2] as int) as lag_10_cnt,
              |        cast(chat_list[3] as int) as lag_15_cnt,
              |        cast(chat_list[4] as int) as lag_30_cnt,
              |        cast(chat_list[5] as int) as lag_30_plus_cnt
-             |    from (select room_id, 'chat' as rtype, uid, split(chat_str, ',') as chat_list from tmp where size(split(chat_str, ',')) = 6) r
+             |    from (select isp,province,room_id, 'chat' as rtype, uid, split(chat_str, ',') as chat_list from tmp where size(split(chat_str, ',')) = 6) r
              |    union all
              |    select
-             |        room_id, 'others' as rtype, uid,
+             |        isp,province,room_id, 'others' as rtype, uid,
              |        cast(others_list[0] as int) as lag_3_cnt,
              |        cast(others_list[1] as int) as lag_5_cnt,
              |        cast(others_list[2] as int) as lag_10_cnt,
              |        cast(others_list[3] as int) as lag_15_cnt,
              |        cast(others_list[4] as int) as lag_30_cnt,
              |        cast(others_list[5] as int) as lag_30_plus_cnt
-             |    from (select room_id, 'others' as rtype, uid, split(others_str, ',') as others_list from tmp where size(split(others_str, ',')) = 6 ) r
+             |    from (select isp,province,room_id, 'others' as rtype, uid, split(others_str, ',') as others_list from tmp where size(split(others_str, ',')) = 6 ) r
              |) s
-             |group by room_id, rtype
+             |group by isp,province,room_id, rtype
              |;
            """.stripMargin
         )
         /*"jdbc:mysql://140.143.137.196:3306/kingcall"*/
-        result.write.mode(SaveMode.Append).jdbc("jdbc:mysql://10.52.7.209:3306/monitor", "danmu_delay", mysqlConf)
+        result.write.mode(SaveMode.Append).jdbc("jdbc:mysql://10.52.7.209:3306/monitor", "danmu_delay_2", mysqlConf)
       }
     )
     streaming.start()
