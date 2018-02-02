@@ -8,7 +8,7 @@ object structedDemo {
   import org.apache.spark.sql.functions._
   import org.apache.spark.sql.SparkSession
   def main(args: Array[String]): Unit = {
-    val spark = SparkSession.builder().appName("Base Demo").master("local[2]").config(sparkConf).getOrCreate()
+    val spark = SparkSession.builder().appName("Base Demo").master("local[2]").getOrCreate()
     val lines = spark.readStream
       .format("socket")
       .option("host", "localhost")

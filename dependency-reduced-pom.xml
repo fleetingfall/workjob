@@ -60,7 +60,7 @@
                 </transformer>
                 <transformer>
                   <manifestEntries>
-                    <Main-Class>kafka.test</Main-Class>
+                    <Main-Class>kafka.DirectMethod</Main-Class>
                   </manifestEntries>
                 </transformer>
                 <transformer>
@@ -93,7 +93,7 @@
     <hadoop.version>2.7.2</hadoop.version>
     <tmp.version>2.11</tmp.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <spark.version>2.0.2</spark.version>
+    <spark.version>2.1.1</spark.version>
   </properties>
 </project>
 

@@ -17,6 +17,4 @@ object ConfigUtil {
     ).getLines().filterNot(_.startsWith("#")).foreach(kv)
     prop
   }
-
-
 }

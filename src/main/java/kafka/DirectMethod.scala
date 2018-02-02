@@ -13,12 +13,13 @@ import org.apache.spark.streaming.{Seconds, StreamingContext}
 object DirectMethod {
 
   case class Bean(isp:String,province:String,uid:Int,s_path:String,chat:String,other:String)
-  val sparkConf = new SparkConf().set("spark.testing.memory", "2147480000")
+//  val sparkConf = new SparkConf().set("spark.testing.memory", "2147480000")
   /*SparkSession
   * Spark2.0中引入了SparkSession的概念，它为用户提供了一个统一的切入点来使用Spark的各项功能，以前需要sparkConf--->SparkContext--->sqlContext
   * 现在一个SparkSession就够了，SparkConf、SparkContext和SQLContext都已经被封装在SparkSession当中。
   * */
-  val sparkSession:SparkSession=SparkSession.builder().appName("Base Demo").master("local[2]").config(sparkConf).getOrCreate()
+  val sparkConf = new SparkConf().setMaster("local[2]")
+  val sparkSession:SparkSession=SparkSession.builder().appName("Base Demo").config(sparkConf).getOrCreate()
   val SQLContext=sparkSession.sqlContext
   private val mysqlConf = new Properties()
   mysqlConf.setProperty("driver", "com.mysql.jdbc.Driver")
@@ -36,7 +37,6 @@ object DirectMethod {
     )
     /*上面的 broker和 zookeeper中的有的信息可以是错误的，但是下面的topic得全部是正确的*/
     val topics = Set("web_log_event")
-
     val streaming=new StreamingContext(sparkSession.sparkContext,Seconds(5))
     val recordDStream: InputDStream[(String, String)] = KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](streaming, kafkaParams, topics)
     recordDStream.foreachRDD(
@@ -45,12 +45,11 @@ object DirectMethod {
         rdd.filter(x=>{
           /*过滤出满足需求的数据，不满足需求的数据按下述操作可能出现错误*/
           val tmpobj=JSON.parseObject(x._2)
-          val ea:String=tmpobj.getString("ea")//事件行为
-          val s_timestamp:Int=tmpobj.getString("s_ts").toInt//上报时间
-          val ec=tmpobj.getString("ec")//事件类别
-          val el:String=tmpobj.getString("el")//事件key
-          val tid=tmpobj.getString("tid")
-          if( el.startsWith("message:") && tid.startsWith("100001") && ea.eq("delay") && ec.equals("danmu_socket") )
+          val ea:String=tmpobj.getString("ea").trim//事件行为
+          val ec=tmpobj.getString("ec").trim//事件类别
+          val el:String=tmpobj.getString("el").trim//事件key
+          val tid=tmpobj.getString("tid").trim
+          if(tid.startsWith("100001") && ea.eq("delay") && ec.equals("danmu_socket") )
             true
           else
             false
@@ -65,11 +64,11 @@ object DirectMethod {
           val tuples=dataPrepare(el)
           Bean(isp,province,uid,s_path,tuples._1,tuples._2)
         }
-        ).toDF("isp","province","uid","room_id","chat_str","others_str").createOrReplaceTempView("tmp")
+        ).toDF("isp","province","uid","s_path","chat_str","others_str").createOrReplaceTempView("tmp")
         val result:DataFrame=sparkSession.sql(
           s"""
             select
-             |    '${time}' as time,isp,province,room_id, rtype,
+             |    isp,province,count(1),count(distinct uid),count(distinct s_path),rtype,sum(lag_3_cnt + lag_5_cnt + lag_10_cnt +lag_15_cnt + lag_30_cnt + lag_30_plus_cnt) cnt ,
              |    sum(lag_3_cnt) as lag_3_cnt,
              |    sum(lag_5_cnt) as lag_5_cnt,
              |    sum(lag_10_cnt) as lag_10_cnt,
@@ -83,28 +82,24 @@ object DirectMethod {
              |    count(distinct if(lag_30_cnt > 0, uid, null)) as lag_30_user,
              |    count(distinct if(lag_30_plus_cnt > 0, uid, null)) as lag_30_plus_user
              |from(
-             |    select
-             |        isp,province,room_id, 'chat' as rtype, uid,
-             |        cast(chat_list[0] as int) as lag_3_cnt,
+             |    select isp,province,s_path, 'chat' as rtype, uid,cast(chat_list[0] as int) as lag_3_cnt,
              |        cast(chat_list[1] as int) as lag_5_cnt,
              |        cast(chat_list[2] as int) as lag_10_cnt,
              |        cast(chat_list[3] as int) as lag_15_cnt,
              |        cast(chat_list[4] as int) as lag_30_cnt,
              |        cast(chat_list[5] as int) as lag_30_plus_cnt
-             |    from (select isp,province,room_id, 'chat' as rtype, uid, split(chat_str, ',') as chat_list from tmp where size(split(chat_str, ',')) = 6) r
+             |    from (select isp,province,s_path, 'chat' as rtype, uid, split(chat_str, ',') as chat_list from tmp where size(split(chat_str, ',')) = 6 ) r
              |    union all
-             |    select
-             |        isp,province,room_id, 'others' as rtype, uid,
+             |    select isp,province,s_path, 'others' as rtype, uid,
              |        cast(others_list[0] as int) as lag_3_cnt,
              |        cast(others_list[1] as int) as lag_5_cnt,
              |        cast(others_list[2] as int) as lag_10_cnt,
              |        cast(others_list[3] as int) as lag_15_cnt,
              |        cast(others_list[4] as int) as lag_30_cnt,
              |        cast(others_list[5] as int) as lag_30_plus_cnt
-             |    from (select isp,province,room_id, 'others' as rtype, uid, split(others_str, ',') as others_list from tmp where size(split(others_str, ',')) = 6 ) r
+             |    from (select isp,province,s_path, 'others' as rtype, uid, split(others_str, ',') as others_list from tmp where size(split(others_str, ',')) = 6 ) r
              |) s
-             |group by isp,province,room_id, rtype
-             |;
+             |group by isp,province,rtype grouping sets ((isp,province,rtype),(isp,rtype), (province,rtype),(isp,province),rtype,province,isp,())
            """.stripMargin
         )
         /*"jdbc:mysql://140.143.137.196:3306/kingcall"*/
@@ -114,7 +109,6 @@ object DirectMethod {
     streaming.start()
     streaming.awaitTermination()
   }
-
   def dataPrepare(str:String): Tuple2[String,String] ={
     val p=JSON.parseObject(str.replace("message:",""))
     val s1:String=p.get("chat").toString.replaceAll("['\\[' '\\]']","")
