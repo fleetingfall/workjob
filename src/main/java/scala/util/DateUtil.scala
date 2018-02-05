@@ -58,6 +58,16 @@ object DateUtil {
     val dt = dateFormat.format( now )
     dt
   }
+  /**
+    *
+    * @return 返回当前的数组形式
+    */
+  def getDateNowByArray():Array[String]={
+    val now:Date = new Date()
+    val dateFormat:SimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss")
+    val dt = dateFormat.format( now )
+    dt.split("-")
+  }
 
   /**
     * 指定日期和间隔天数，返回指定日期前N天的日期 date - N days
@@ -122,7 +132,6 @@ object DateUtil {
   }
 
   def main(args: Array[String]): Unit = {
-    print(new Date("2018-01-25").getTime)
+    println(    getDateNowByArray().mkString("-"))
   }
-
 }

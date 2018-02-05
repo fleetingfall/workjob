@@ -47,7 +47,6 @@ object SaveToLocal {
     */
   def createFolderAndGetPath():String={
     val path=basepath+getTimePath()
-   /* new File(path).mkdirs() 可以不要了，因为在后面还有创建文件夹，可以一次性创建*/
     path
 }
 
@@ -75,7 +74,7 @@ object SaveToLocal {
     * 直接保存流对象
     * @param inputStream 流对象
     */
-  def saveByAtreaming(inputStream:ReceiverInputDStream[(String,String)]): Unit ={
+  def saveByStreaming(inputStream:ReceiverInputDStream[(String,String)]): Unit ={
     /*前缀-时间.后缀  那么只会保存在Executor所在机器的本地目录*/
     inputStream.saveAsTextFiles("C:\\Users\\PLUSH80702\\Desktop\\receive\\")
     /*支持在本地运行然后存储到hdfs上去*/
