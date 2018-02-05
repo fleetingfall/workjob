@@ -1,19 +1,26 @@
 package scala.sparkSql
 
-import org.apache.spark.sql.{Row, SparkSession}
+import com.alibaba.fastjson.JSON
+import kafka.serializer.StringDecoder
+import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 import org.apache.spark.sql.types.{StringType, StructField, StructType}
+import org.apache.spark.streaming.kafka.KafkaUtils
+import org.apache.spark.streaming.{Seconds, StreamingContext}
+
+import scala.firstwork.OriginalMessageBean
 
 /*
 * 实践告诉我case class 最好写在外面
 * */
 case class people(id:String,name:String,age:String)
+case class Bean(client_ip:String,is_blocked:String,args:String,status:String,uid:String,host:String)
 
 
 object toDF {
   val sparkSession:SparkSession=SparkSession.builder().appName("Base Demo").master("local[2]").getOrCreate()
 
   def main(args: Array[String]): Unit = {
-    jsonObjToDF(sparkSession)
+    jsonObjToDF2(sparkSession)
   }
   def StructTypeMethod(sparkSession:SparkSession): Unit ={
     /*
@@ -47,8 +54,32 @@ object toDF {
   * json----->
   * */
   def jsonObjToDF(sparkSession:SparkSession): Unit ={
-    val JSONRDD=sparkSession.sparkContext.textFile("D:\\workingspace\\Code\\workjob\\src\\main\\resources\\json.txt")
-    JSONRDD
+    println("接收数据开始")
+    import sparkSession.sqlContext.implicits._
+    val scc=new StreamingContext(sparkSession.sparkContext,Seconds(2))
+    val kafkaParams = Map(
+      "metadata.broker.list" -> "master:9092"
+    )
+    val topics = Set("longzhuresty")
+    /*查没有过期的用法是什么*/
+    val inputrdd=KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](scc,kafkaParams,topics )
+    inputrdd.foreachRDD(rdd=>{
+      if(!rdd.isEmpty()) rdd.map(x=>{
+        var tmpobj=JSON.parseObject(x._2).asInstanceOf[OriginalMessageBean]
+        println(tmpobj)
+      })
+    })
+    scc.start()
+    scc.awaitTermination()
   }
+  /*
+  * 新的问题是如何将java对象的DF转换成DF
+  * */
+  def jsonObjToDF2(sparkSession:SparkSession): Unit ={
+    val s="""{"args":"kingcall","client_ip":"847.478.245.838","host":"110.110.110.110","is_blocked":"1","status":"200","uid":"ca7e38a74bbd4f478a70005047bf6ccc"}"""
+    val p:OriginalMessageBean=JSON.parseObject(s).toJavaObject(classOf[OriginalMessageBean])
+    println(p)
+  }
+
 
 }

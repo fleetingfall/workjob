@@ -1,6 +1,9 @@
 package scala.firstwork;
 
 public class OriginalMessageBean {
+    public static void main(String[] args) {
+
+    }
     String  client_ip;
     String is_blocked;
     String args;
