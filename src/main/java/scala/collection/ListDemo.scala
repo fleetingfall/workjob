@@ -35,10 +35,15 @@ object ListDemo {
     * */
     println( p.reduce(_-_))
 
-    val p2=List(1,2,3,4,5,6)
-    p.zipAll(p2,0.0,"a").foreach(x=>println(x))
+    val p2=List(1,2,3,4,5)
+    /*中间那个参数的意思实在没有搞懂，好像填什么都行的*/
+    p.zipAll(p2,'r',"a").foreach(x=>println(x))
 
-
+    /*缓存型迭代器   可以先让你判断一下元素，再决定是否消费*/
+  val pit=  p2.iterator.buffered
+    while (pit.hasNext && pit.head.%(2)==0){
+      println("===================="+pit.next())
+    }
   }
 
 

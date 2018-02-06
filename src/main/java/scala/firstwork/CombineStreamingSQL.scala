@@ -2,6 +2,7 @@ package scala.firstwork
 
 import com.alibaba.fastjson.JSON
 import kafka.serializer.StringDecoder
+import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 import org.apache.spark.streaming.kafka.KafkaUtils
@@ -16,6 +17,8 @@ case class Bean(client_ip:String,is_blocked:String,args:String,status:String,uid
   * 采取Spark-Streaming和Kafka直连的方式,但是不知道为什么要等很久才可以获取到数据（相比另一种对接的方式），
   */
 object CombineStreamingSQL extends Job{
+  val sparkSession:SparkSession=SparkSession.builder().appName("Base Demo").master("local[2]").getOrCreate()
+  import sparkSession.sqlContext.implicits._
 
   def initwork(): Unit ={
     configs=initJobConf("SaveResty-10.properties")
@@ -26,7 +29,7 @@ object CombineStreamingSQL extends Job{
 
   def main(args: Array[String]): Unit = {
     initwork()
-    val sparkSession:SparkSession=SparkSession.builder().appName("Base Demo").master("local[2]").getOrCreate()
+
     sparkSession.udf.register("domaindeal",domaindeal _)
     val scc=new StreamingContext(sparkSession.sparkContext,Seconds(2))
     val kafkaParams = Map(
@@ -43,45 +46,51 @@ object CombineStreamingSQL extends Job{
     val fieldList:List[String]="client_ip,is_blocked,args,status,uid,host,request_timestamp".split(",").toList
     inputrdd.foreachRDD(rdd=>{
       if(!rdd.isEmpty()){
-
-        val DF:DataFrame= rdd.map(x => {
-          var tmpobj = JSON.parseObject(x._2)
-          /*其实在这里写一个工具类，将简单对象的JSON字符串----->对象        */
-          Bean(tmpobj.get("client_ip").toString, tmpobj.get("is_blocked").toString, tmpobj.get("args").toString,
-            tmpobj.get("status").toString, tmpobj.get("uid").toString, tmpobj.get("host").toString, tmpobj.get("request_timestamp").toString.substring(0,10))
-        }).toDF()
-
-        //第一种处理方式，需要在textFormat 方法中完成 不借助SQL,通过函数来构造所需的分区 当然它的结果是可以被第二种存储方式直接存储的
-
-
-        val DF1=DF.mapPartitions(textFormat(_,fieldList)).toDF("year", "month", "day","Hour","Minutes","domain_host","record")
-        saveAsStreamingText(DF1)
-
-
-        //第二种种处理方式  借助SQL来构造所需的分区，但是可能会需要一个函数，否则SQL会很长(可不可以借助 in 来解决 not in的全部是others)
-
-        """
-          |select
-          |   FROM_UNIXTIME(request_timestamp,'yyyy') as year,
-          |   FROM_UNIXTIME(request_timestamp,'MM') as month,
-          |   FROM_UNIXTIME(request_timestamp,'dd') as day,
-          |   FROM_UNIXTIME(request_timestamp,'HH') as Hour,
-          |   FROM_UNIXTIME(request_timestamp,'mm') as Minutes,
-          |   domain_deal(host) as domain_host,
-          |   *
-          |from kingcall
-        """.stripMargin
-
-        DF.createOrReplaceTempView(configs("tmp.table"))
-        val DF2:DataFrame=sparkSession.sql(
-          configs("sql")
-        )
-        saveStreamingAsOrc(DF2)
+        parseRDDByJson(sparkSession,rdd)
       }
     }
     )
     scc.start()
     scc.awaitTermination()
+  }
+
+  /**
+    * 从流中直接处理json 格式的RDD
+    * @param rdd
+    */
+  def parseRDDByJson(sparkSession: SparkSession,rdd:RDD[(String,String)]): DataFrame ={
+    val DF:DataFrame=sparkSession.read.json(rdd.map(x=>x._2))
+    DF.show()
+    DF
+  }
+
+  /**
+    * 通过隐式转换解析的方式来处理
+    * @param rdd
+    * @return
+    */
+  def parseRDD(rdd:RDD[(String,String)]): DataFrame ={
+    rdd.map(x => {
+      var tmpobj = JSON.parseObject(x._2)
+      /*其实在这里写一个工具类，将简单对象的JSON字符串----->对象        */
+      Bean(tmpobj.get("client_ip").toString, tmpobj.get("is_blocked").toString, tmpobj.get("args").toString,
+        tmpobj.get("status").toString, tmpobj.get("uid").toString, tmpobj.get("host").toString, tmpobj.get("request_timestamp").toString.substring(0,10))
+    }).toDF()
+  }
+
+  //第一种处理方式，需要在textFormat 方法中完成 不借助SQL,通过函数来构造所需的分区 当然它的结果是可以被第二种存储方式直接存储的
+  def dealMethod1(DF:DataFrame,fieldList:List[String]): Unit ={
+    val DF1=DF.mapPartitions(textFormat(_,fieldList)).toDF("year", "month", "day","Hour","Minutes","domain_host","record")
+    saveAsStreamingText(DF1)
+  }
+  //第二种种处理方式  借助SQL来构造所需的分区，但是可能会需要一个函数，否则SQL会很长(可不可以借助 in 来解决 not in的全部是others)
+  def dealMethod2(sparkSession: SparkSession,DF:DataFrame): Unit ={
+    DF.createOrReplaceTempView(configs("tmp.table"))
+    val DF2:DataFrame=sparkSession.sql(
+      configs("sql")
+    )
+    saveStreamingAsOrc(DF2)
+
   }
 
   /*
@@ -150,7 +159,4 @@ object CombineStreamingSQL extends Job{
     else
       "others"
   }
-
-
-
 }

@@ -78,7 +78,6 @@ public class SendMessage {
         String status="200";
         String uid = UUID.randomUUID().toString().replaceAll("-", "");
         String host=hostname[rand.nextInt(hostname.length)];
-
         OriginalMessageBean bean=new OriginalMessageBean(client_ip,is_blocked,args,status,uid,host,String.valueOf(System.currentTimeMillis()));
         return JSON.toJSONString(bean);
     }
