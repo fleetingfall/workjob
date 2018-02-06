@@ -12,11 +12,12 @@ import scala.util.{ConfigUtil, Logging}
   * Created by Andy on 2017/5/12 0012.
   */
 trait Job extends Logging{
+  /*存储其他类型的配置*/
   val paramsContainer = mutable.Map[String, Any]()
+  /*存储字符串类型的配置*/
   var configs = mutable.Map[String, String]()
 
   def initJobConf(conf: String): mutable.Map[String, String] = ConfigUtil.readFile(conf)
-
 
   def getSparkSession(appName: String, parameters: Map[String, String] = Map()): SparkSession = {
     val sparkConf = new SparkConf()

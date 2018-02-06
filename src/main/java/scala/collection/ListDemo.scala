@@ -3,7 +3,7 @@ import scala.collection.mutable._
 object ListDemo {
 
   def main(args: Array[String]): Unit = {
-    val p:List[Int]=List(1,2,3)
+    Functiondemo
   }
 
 
@@ -25,6 +25,20 @@ object ListDemo {
   /*根据特性来遍历*/
   def sumlist(stl:List[Int]): Int ={
     if(stl==Nil) 0 else stl.head+sumlist(stl.tail)
+  }
+
+  def Functiondemo(): Unit ={
+    val p=List(1,2,3,4,5,6,7,8)
+   println( p.reduceLeft(_-_))
+   println( p.reduceRight(_-_))
+    /*默认的Reduce就是从左到右，也就是reduceRight
+    * */
+    println( p.reduce(_-_))
+
+    val p2=List(1,2,3,4,5,6)
+    p.zipAll(p2,0.0,"a").foreach(x=>println(x))
+
+
   }
 
 

@@ -15,7 +15,9 @@ import java.util.UUID;
 
 public class SendMessage {
     public static Random rand=new Random();
-    public static String[] hostname={"192.168.37.129","110.110.110.110","255.255.110.123","102.10.101.10","10.10.10.110"};
+    /*一些特定的host*/
+    public static String[] hostname={"api.longzhu.com","api.plu.cn","betapi.longzhu.com","configapi.longzhu.com","event-api.longzhu.com","giftapi.plu.cn",
+            "id-api.longzhu.com","login.plu.cn","mb.tga.plu.cn"};
 
     public static void main(String[] args) {
        sendMessage();
@@ -76,7 +78,8 @@ public class SendMessage {
         String status="200";
         String uid = UUID.randomUUID().toString().replaceAll("-", "");
         String host=hostname[rand.nextInt(hostname.length)];
-        OriginalMessageBean bean=new OriginalMessageBean(client_ip,is_blocked,args,status,uid,host);
+
+        OriginalMessageBean bean=new OriginalMessageBean(client_ip,is_blocked,args,status,uid,host,String.valueOf(System.currentTimeMillis()));
         return JSON.toJSONString(bean);
     }
 }

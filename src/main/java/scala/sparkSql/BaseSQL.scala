@@ -27,7 +27,7 @@ object BaseSQL {
   val sparksession=SparkSession.builder().appName("Test").master("local[2]").enableHiveSupport().getOrCreate()
   def main(args: Array[String]): Unit = {
 
-    test()
+    WithTime(sparksession)
   }
 
 
@@ -56,15 +56,28 @@ object BaseSQL {
   /**
     * case(unix_timestamp(t1.D504_11,'dd-MM-yyyy')
     * spark-SQL自带的时间处理函数
+    *
+    * 注意字母大小写的格式，可能导致算出来的时期有误
     */
   def WithTime(sparksession:SparkSession): Unit ={
     /*从时间获取对应的时间戳*/
     sparksession.sql("select unix_timestamp('2018-1-28' ,'DD-MM-yyyy') as time").show()
-    /*从时间戳获取时间*/
+    /*从时间戳/时间戳字符串    获取不同格式的时间字符串*/
     sparksession.sql("SELECT FROM_UNIXTIME( 1195488000, '%Y年%m月%d' )  as time").show()
     /*获取的是当前时间的时间戳字符串*/
     sparksession.sql("select unix_timestamp() as time").show()
-    sparksession.sql("select unix_timestamp(new Date()) as time").show()
+    println("全时间")
+    sparksession.sql("select FROM_UNIXTIME(1517889027,'dd-MM-yyyy:HH-mm-ss') as time").show()
+    println("年")
+    sparksession.sql("select FROM_UNIXTIME(1517889027,'yyyy') as time").show()
+    println("月")
+    sparksession.sql("select FROM_UNIXTIME(1517889027,'MM') as time").show()
+    println("日")
+    sparksession.sql("select FROM_UNIXTIME(1517889027,'dd') as time").show()
+    println("小时")
+    sparksession.sql("select FROM_UNIXTIME(1517889027,'HH') as time").show()
+    println("分钟")
+    sparksession.sql("select FROM_UNIXTIME(1517889027,'mm') as time").show()
   }
 
   /*
@@ -110,5 +123,6 @@ object BaseSQL {
     result.show()
     sparksession.stop()
   }
+
 
 }

@@ -114,11 +114,16 @@
     <build>
         <resources>
             <resource>
-                <directory>src/main/java</directory>
+                <directory>${basedir}/src/main/java</directory>
                 <includes>
+                    <include>*.properties</include>
+                    <include>*/*.properties</include>
+                    <include>*.txt</include>
                     <include>*/*.txt</include>
                 </includes>
-                <filtering>false</filtering>
+            </resource>
+            <resource>
+                <directory>${basedir}/src/main/resources</directory>
             </resource>
         </resources>
         <finalName>workjob</finalName>
