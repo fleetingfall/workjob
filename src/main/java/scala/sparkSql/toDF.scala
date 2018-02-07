@@ -20,8 +20,9 @@ object toDF {
   val sparkSession:SparkSession=SparkSession.builder().appName("Base Demo").master("local[2]").getOrCreate()
 
   def main(args: Array[String]): Unit = {
-    jsonDF(sparkSession)
+    jsonToDF(sparkSession)
   }
+
   def StructTypeMethod(sparkSession:SparkSession): Unit ={
     /*
     *  字段比较少的时候可以采用下面的方式书写
@@ -51,9 +52,9 @@ object toDF {
   }
 
   /*
-  * json----->
+  * 直接从流中读取成DF
   * */
-  def jsonObjToDF(sparkSession:SparkSession): Unit ={
+  def jsonToDF(sparkSession:SparkSession): Unit ={
     println("接收数据开始")
     import sparkSession.sqlContext.implicits._
     val scc=new StreamingContext(sparkSession.sparkContext,Seconds(2))
@@ -64,14 +65,15 @@ object toDF {
     /*查没有过期的用法是什么*/
     val inputrdd=KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](scc,kafkaParams,topics )
     inputrdd.foreachRDD(rdd=>{
-      if(!rdd.isEmpty()) rdd.map(x=>{
-        var tmpobj=JSON.parseObject(x._2).asInstanceOf[OriginalMessageBean]
-        println(tmpobj)
-      })
+      if (!rdd.isEmpty()){
+        sparkSession.read.json(rdd.map(x=>x._2)).show()
+      }
     })
     scc.start()
     scc.awaitTermination()
   }
+
+
   /*
   * 新的问题是如何将java对象的DF转换成DF
   * */
