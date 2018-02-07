@@ -22,4 +22,9 @@ object test {
     println(sql2)
   }
 
+  def test2(): Unit ={
+   val s= """{"args":"kingcall","client_ip":"024.441.325.633","host":"10.10.10.110","is_blocked":"1","status":"200","uid":"21c52fccc5654608aa89438dafa63df4"}"""
+
+  }
+
 }
