@@ -26,6 +26,9 @@ object CombineStreamingSQL extends Job{
     configs += ("sql" -> sql)
 
   }
+  def test(): Unit ={
+
+  }
 
   def main(args: Array[String]): Unit = {
     initwork()
