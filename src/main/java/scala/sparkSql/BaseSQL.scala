@@ -24,10 +24,12 @@ import scala.util.DateUtil
 
   */
 object BaseSQL {
+
   val sparksession=SparkSession.builder().appName("Test").master("local[2]").enableHiveSupport().getOrCreate()
+
   def main(args: Array[String]): Unit = {
 
-    WithTime(sparksession)
+    dataTypeChange(sparksession)
   }
 
 
@@ -55,7 +57,7 @@ object BaseSQL {
 
   /**
     * case(unix_timestamp(t1.D504_11,'dd-MM-yyyy')
-    * spark-SQL自带的时间处理函数
+    * spark-SQL自带的时间处理函数  对于时间戳字符串也可以
     *
     * 注意字母大小写的格式，可能导致算出来的时期有误
     */
@@ -78,6 +80,16 @@ object BaseSQL {
     sparksession.sql("select FROM_UNIXTIME(1517889027,'HH') as time").show()
     println("分钟")
     sparksession.sql("select FROM_UNIXTIME(1517889027,'mm') as time").show()
+
+  }
+  /*当时间戳是13位  或者10.3  类型的时候*/
+  def WithTime2(sparksession:SparkSession): Unit ={
+
+    //13 位的解决方案
+    sparksession.sql(" select FROM_UNIXTIME('1517889027123','yyyy-MM-dd:HH-mm-ss') as time").show()
+    sparksession.sql(" select FROM_UNIXTIME('1517889027123'/1000,'yyyy-MM-dd:HH-mm-ss') as time").show()
+    //10.3的解决方案 会发现 10.3 m没有影响
+    sparksession.sql(" select FROM_UNIXTIME('1517889027.123','yyyy-MM-dd:HH-mm-ss') as time").show()
   }
 
   /*
@@ -122,6 +134,19 @@ object BaseSQL {
     )
     result.show()
     sparksession.stop()
+  }
+
+  /**
+    * 在SQL中的数据类型转换
+    */
+
+  def dataTypeChange(sparksession:SparkSession): Unit ={
+    val s="1517889027.123"
+    //如果你细心的话，会发现其实sparksql 帮你做了优化————更多的转换步骤
+    sparksession.sql(s"select cast('${s}'*1000 as bigint)").show()
+    sparksession.sql("select 0.000004 as bigint").show()
+
+
   }
 
 

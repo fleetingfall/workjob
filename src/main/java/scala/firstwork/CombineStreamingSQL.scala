@@ -3,6 +3,7 @@ package scala.firstwork
 import com.alibaba.fastjson.JSON
 import kafka.serializer.StringDecoder
 import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.types.{StringType, StructField, StructType}
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 import org.apache.spark.streaming.kafka.KafkaUtils
@@ -22,7 +23,8 @@ object CombineStreamingSQL extends Job{
 
   def initwork(): Unit ={
     configs=initJobConf("SaveResty-10.properties")
-    val sql=configs("sql").replace("@", "from_unixtime")
+    /*由于模拟时间产生的时间戳是13位，在转换时出现问题，所以除了1000后再传递给了 时间函数 */
+    val sql=configs("sql").replace("@", "from_unixtime").replace("request_timestamp","request_timestamp/1000").format(configs("fields"))
     configs += ("sql" -> sql)
 
   }
@@ -49,12 +51,43 @@ object CombineStreamingSQL extends Job{
     val fieldList:List[String]="client_ip,is_blocked,args,status,uid,host,request_timestamp".split(",").toList
     inputrdd.foreachRDD(rdd=>{
       if(!rdd.isEmpty()){
-        parseRDDByJson(sparkSession,rdd)
+        dealMethod2(sparkSession,parseRDDByStruct(sparkSession,rdd))
       }
     }
     )
     scc.start()
     scc.awaitTermination()
+  }
+
+  /**
+    * 隐式转换函数  用来创建表结构  被parseRDDByStruct 函数调用
+    * @param fieldsStr
+    * @return
+    */
+
+  implicit def defineSchema(fieldsStr:String):StructType={
+    println("隐式转换函数被调用")
+    StructType(
+      fieldsStr.split(",").map(fieldName ⇒ StructField(fieldName, StringType, true))
+    )
+  }
+
+  /**
+    * StructType  类型的转换 舍弃一些不必要的列
+    * @param sparkSession
+    * @param rdd
+    * @return
+    */
+
+  def parseRDDByStruct(sparkSession: SparkSession,rdd:RDD[(String,String)]): DataFrame ={
+    val read=sparkSession.read
+    read.schema(configs("fields"))  // 这方法每次都回去调用隐式转换函数
+    val DF=read.json(rdd.map(x=>x._2))
+    DF.show()
+    DF.createOrReplaceTempView("tmps")
+    val DF2=sparkSession.sql(configs("sql2"))
+    DF2.show()
+    DF2
   }
 
   /**
@@ -92,6 +125,7 @@ object CombineStreamingSQL extends Job{
     val DF2:DataFrame=sparkSession.sql(
       configs("sql")
     )
+    DF2.show()
     saveStreamingAsOrc(DF2)
 
   }
@@ -102,12 +136,13 @@ object CombineStreamingSQL extends Job{
   def saveStreamingAsOrc(df: DataFrame,
                          saveMode: String = "append"): Unit = {
     df.repartition(1).write.mode(saveMode)
-      .partitionBy("year", "month", "day","Hour","Minutes","domain")
-      .orc("C:\\Users\\PLUSH80702\\Desktop\\receive2")
+      .partitionBy(configs("partition.format").split(","):_*)
+      .orc(configs("save.path.orc"))
   }
 
 
-  /*验证DF的直接存储  忘记了Hive的分区原则了吗，就是某一列啊
+  /*
+  * 验证DF的直接存储  忘记了Hive的分区原则了吗，就是某一列啊
   * 由于 DataFrame 是一张表，所以在存储的时候每一行都有个分隔符，option就是字段之间的分割符号
   * 存在一个问题：除过分区列，只能有一列，也就是除过分区列，其他列要合并成一列
   * */

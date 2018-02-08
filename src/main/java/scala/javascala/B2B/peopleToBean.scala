@@ -28,7 +28,7 @@ object peopleToBean {
     println(p)
     println( p.values())
 
-    bp(p.values():_*)
+   /* bp(p.values():_*)*/
   }
 
 }
