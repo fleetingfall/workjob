@@ -24,9 +24,10 @@ object structedDemo {
   * */
   import org.apache.spark.sql.functions._
   import org.apache.spark.sql.SparkSession
-  val spark = SparkSession.builder().appName("Base Demo").master("local[2]").getOrCreate()
+  val spark = SparkSession.builder().appName("Base Demo").master("local[2]").config("spark.sql.streaming.checkpointLocation","C:\\Users\\PLUSH80702\\Desktop\\check").getOrCreate()
   def main(args: Array[String]): Unit = {
-    createSDFByKafka
+    writeDFtoKafka
+
 
   }
 
@@ -63,15 +64,35 @@ object structedDemo {
   * 新的问题是：如何还原成包含多列信息的DF
   * */
   def createSDFByKafka(): Unit ={
+    /*你甚至可以指定kafka的offset*/
     val lines:DataFrame=spark.readStream.format("kafka")
-        .option("kafka.bootstrap.servers", "master:9092")
-        .option("subscribe", "longzhuresty")
+        .option("kafka.bootstrap.servers", "master:9092")// "host1:port1,host2:port2" 可以添加多台机器
+        .option("subscribe", "longzhuresty")// 正则订阅.option("subscribePattern", "topic.*")   订阅多个topic  option("subscribe", "topic1,topic2")
         .load()
     import spark.implicits._
     val DF=lines.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)").as[(String, String)]
     val DF2=DF.select("value")
     val result=DF2.writeStream.outputMode("append").format("console").start()
     result.awaitTermination()
+
+  }
+
+  /**
+    * 这个方法失败了
+    */
+  def writeDFtoKafka(): Unit ={
+    import spark.implicits._
+    val lines:DataFrame=spark.readStream.format("kafka")
+      .option("kafka.bootstrap.servers", "master:9092")// "host1:port1,host2:port2" 可以添加多台机器
+      .option("subscribe", "longzhuresty")// 正则订阅.option("subscribePattern", "topic.*")   订阅多个topic  option("subscribe", "topic1,topic2")
+      .load()
+    val DF=lines.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)")
+      .writeStream
+      .format("kafka")
+      .option("kafka.bootstrap.servers", "slav1:9092,slave2:9092")
+      .option("topic", "topic1")
+      .start()
+    DF.awaitTermination()
 
   }
 

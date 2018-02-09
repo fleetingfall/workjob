@@ -14,13 +14,19 @@ import scala.firstwork.OriginalMessageBean
 * */
 case class people(id:String,name:String,age:String)
 
+object AboutDS{
+  val sparkSession:SparkSession=SparkSession.builder().appName("Base Demo").master("local[2]").getOrCreate()
+  import sparkSession.sqlContext.implicits
+}
 
-
+/**
+  * DF其实也是支持一些RDD的操作
+  */
 object toDF {
   val sparkSession:SparkSession=SparkSession.builder().appName("Base Demo").master("local[2]").getOrCreate()
 
   def main(args: Array[String]): Unit = {
-    jsonToDF(sparkSession)
+    jsonDF(sparkSession)
   }
 
   def StructTypeMethod(sparkSession:SparkSession): Unit ={
@@ -48,7 +54,9 @@ object toDF {
   * 将本地的json读成DF
   * */
   def jsonDF(sparkSession:SparkSession): Unit ={
-    sparkSession.read.json("src/main/resources/json.txt").toDF().show()
+    val DF=sparkSession.read.json("src/main/resources/json.txt").toDF()
+    DF.show()
+
   }
 
   /*

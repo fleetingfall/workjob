@@ -38,9 +38,9 @@ object CombineStreamingSQL extends Job{
     sparkSession.udf.register("domaindeal",domaindeal _)
     val scc=new StreamingContext(sparkSession.sparkContext,Seconds(2))
     val kafkaParams = Map(
-      "metadata.broker.list" -> "master:9092"
+      "metadata.broker.list" -> "slave1:9092"
     )
-    val topics = Set("longzhuresty")
+    val topics = Set("kingcall")
     /*查没有过期的用法是什么*/
     val inputrdd=KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](scc,kafkaParams,topics )
     val SQLContext=sparkSession.sqlContext
@@ -83,10 +83,8 @@ object CombineStreamingSQL extends Job{
     val read=sparkSession.read
     read.schema(configs("fields"))  // 这方法每次都回去调用隐式转换函数
     val DF=read.json(rdd.map(x=>x._2))
-    DF.show()
     DF.createOrReplaceTempView("tmps")
     val DF2=sparkSession.sql(configs("sql2"))
-    DF2.show()
     DF2
   }
 
@@ -125,7 +123,6 @@ object CombineStreamingSQL extends Job{
     val DF2:DataFrame=sparkSession.sql(
       configs("sql")
     )
-    DF2.show()
     saveStreamingAsOrc(DF2)
 
   }

@@ -4,7 +4,7 @@ import java.util.Properties
 
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 
-object BaseDemo {
+object MysqlUtil {
 
 
   var mysqlConf=new Properties()

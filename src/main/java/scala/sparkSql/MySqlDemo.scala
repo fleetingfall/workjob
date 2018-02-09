@@ -4,7 +4,7 @@ import java.util.Properties
 
 import org.apache.spark.sql.{DataFrame, Dataset, SaveMode, SparkSession}
 
-import scala.sparkSql.BaseDemo.{mysqlConf, result}
+import scala.sparkSql.MysqlUtil.{mysqlConf, result}
 
 object MySqlDemo {
   private var  mysqlConf=new Properties()
