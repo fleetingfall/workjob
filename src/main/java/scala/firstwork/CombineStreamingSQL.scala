@@ -38,9 +38,9 @@ object CombineStreamingSQL extends Job{
     sparkSession.udf.register("domaindeal",domaindeal _)
     val scc=new StreamingContext(sparkSession.sparkContext,Seconds(2))
     val kafkaParams = Map(
-      "metadata.broker.list" -> "slave1:9092"
+      "metadata.broker.list" -> "master:9092"
     )
-    val topics = Set("kingcall")
+    val topics = Set("ktp")
     /*查没有过期的用法是什么*/
     val inputrdd=KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](scc,kafkaParams,topics )
     val SQLContext=sparkSession.sqlContext
