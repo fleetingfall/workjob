@@ -9,14 +9,15 @@ import java.io.{FileNotFoundException, IOException}
 object CassDemo {
 
   def main(args: Array[String]): Unit = {
-    test_judgeIdentify
+
   }
 
   /**
     * 变量匹配实例
+    * 发现tmp获取了 ch的值
     */
   def test1(): Unit = {
-    val ch: Char = '&'
+    val ch: Char = 'w'
     val tmp = '+'
     val p = ch match {
       case '+' | '&' => 0
@@ -24,10 +25,18 @@ object CassDemo {
       case '*' => -1
       case '/' => -1
       // 模式变量  在模式中使用变量，而且发现并没有发生掉入下一分支问题
-      case tmp => -10
+      case tmp => println(tmp)
       //避免无匹配出现 MatchError
       case _ => -2
     }
+    println(p)
+  }
+  // println(matchTest(6))
+  def matchTest(x: Any): Any = x match {
+    case 1 => "one"
+    case "two" => 2
+    case y: Int =>println(y); "scala.Int"
+    case _ => "many"
   }
     /*守卫：在满足case 后面的条件后，可以再跟一些条件，进行双重过滤*/
     //看脸（人）的社会

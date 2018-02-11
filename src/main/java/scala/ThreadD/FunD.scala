@@ -1,13 +1,13 @@
 package scala.ThreadD
 
 import java.net.{ServerSocket, Socket}
-import java.time.LocalTime
 import java.util.concurrent.{Callable, ExecutorService, Executors, FutureTask}
 
 import org.junit.Test
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{Future, Promise}
+import scala.concurrent.{Await, Future, Promise}
+import scala.language.postfixOps
 import scala.util.{Failure, Random, Success}
 
 /**
@@ -20,7 +20,7 @@ object FunD  {
   def main(args: Array[String]): Unit = {
     /*hello.start()*/
     /*(new NetworkService2(2020, 2)).run*/
-    FunDemo
+    teDM2
 
   }
   def teDM(): Unit ={
@@ -30,6 +30,17 @@ object FunD  {
     }
     println("我是主函数")
     Thread.sleep(10*1000)
+  }
+  def teDM2(): Unit ={
+    val f = Future{ 1 + 2 }
+    f.onComplete{
+      t => t match{
+        case Success(v) => println("success: " + v)
+        case Failure(t) => println("failed: " + t.getMessage)
+      } }
+    //等待任务结束
+ /*   Await.ready(f, 10 second)*/
+
   }
 
   def FunDemo(): Unit ={

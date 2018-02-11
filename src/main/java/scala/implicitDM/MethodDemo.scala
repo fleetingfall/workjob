@@ -1,4 +1,4 @@
-package scala.`implicit`
+package scala.implicitDM
 
 object ImplicitDemo {
   /*
@@ -26,3 +26,23 @@ object ImplicitDemo {
   }
 
 }
+
+
+object ImplictDemo1 extends App {
+  /*隐式转换规则        在同一个稳文件中           在其他包中引入进来*/
+  implicit def double2Int(x:Double)=x.toInt
+  var x:Int=3.5
+  print(x)
+
+}
+
+object FractionDM{
+  implicit def int2Fraction(n:Int)=new Fraction(n,1)
+
+  def main(args: Array[String]): Unit = {
+    val p=Fraction(3,5)*Fraction(4,5)
+    println(p)
+  }
+
+}
+
