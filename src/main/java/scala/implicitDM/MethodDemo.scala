@@ -36,12 +36,19 @@ object ImplictDemo1 extends App {
 
 }
 
+/**
+  * 而且发现隐式转换函数也只能位于伴生对象或当前作用域中
+  */
 object FractionDM{
   implicit def int2Fraction(n:Int)=new Fraction(n,1)
-
   def main(args: Array[String]): Unit = {
-    val p=Fraction(3,5)*Fraction(4,5)
+    val p=new Fraction(3,5)
+    val q=new Fraction(3,5)
     println(p)
+    println(q)
+    println(p*q)
+    println(3*q)
+    println(4*Fraction(3,8))
   }
 
 }
