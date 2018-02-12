@@ -2,7 +2,7 @@ package scala.javascala.B2B
 
 import com.alibaba.fastjson.{JSON, JSONObject}
 
-import scala.firstwork.OriginalMessageBean
+import sparkDM.firstwork.OriginalMessageBean
 
 case class bp(name:String,age:Int)
 object peopleToBean {

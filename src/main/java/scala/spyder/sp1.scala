@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.ConcurrentHashMap
+
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 
@@ -12,9 +13,7 @@ import scala.collection.JavaConversions._
 import scala.collection.parallel.ForkJoinTaskSupport
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.forkjoin.ForkJoinPool
-import scala.util.Failure
-import scala.util.Success
-import scala.util.Try
+import scala.util.{Failure, Success, Try}
 
 object sp1 {
   val basePath="D:\\workingspace\\spider\\scala\\"

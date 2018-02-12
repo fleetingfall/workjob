@@ -2,6 +2,7 @@ package scala.spyder
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+
 import scala.collection.JavaConversions._
 import scala.util.{Failure, Success, Try}
 

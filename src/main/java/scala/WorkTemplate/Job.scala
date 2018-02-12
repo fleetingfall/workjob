@@ -2,11 +2,11 @@ package scala.WorkTemplate
 
 import org.apache.spark.SparkConf
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{SparkSession}
+import org.apache.spark.sql.SparkSession
 import org.apache.spark.streaming.kafka.{HasOffsetRanges, KafkaUtils}
+import util.{ConfigUtil, Logging}
 
 import scala.collection.mutable
-import scala.util.{ConfigUtil, Logging}
 
 /**
   * Created by Andy on 2017/5/12 0012.
