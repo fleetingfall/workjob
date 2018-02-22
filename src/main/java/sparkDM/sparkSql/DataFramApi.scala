@@ -3,12 +3,15 @@ package sparkDM.sparkSql
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
 
-/*DF 的 API*/
+/*DF 的 API
+* DF() 此方法不支持选多列  只能选单列
+*
+* */
 object DataFramApi {
   val sparkSession:SparkSession=SparkSession.builder().appName("Base Demo").master("local[2]").getOrCreate()
   val DF=sparkSession.read.json("src/main/resources/json.txt")
   def main(args: Array[String]): Unit = {
-    castDemo(DF)
+    OperationDM(DF)
   }
   def test1(DF:DataFrame): Unit ={
     DF.show()
@@ -70,6 +73,14 @@ object DataFramApi {
     DF.select(DF("status").cast("bigint")).show()
     /*好像只能一列一列的将数据表示了*/
     DF.select(DF("*"),DF("status").cast("bigint")).show()
+  }
+
+  /**
+    * 不合适的类操作可能导致此列全部为空
+    * @param DF
+    */
+  def OperationDM(DF:DataFrame): Unit ={
+    DF.select(DF("args")+1.toString,DF("status")+1).show()
 
   }
 

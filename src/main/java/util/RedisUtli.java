@@ -6,11 +6,16 @@ import java.util.List;
 import java.util.Set;
 
 public class RedisUtli {
-
+    public static void main(String[] args) {
+        setList("kc","刘文强","刘备","刘邦","刘婵","刘谦");
+        List<String> list=getList("kc",0,20);
+        for (int i = 0; i < list.size(); i++) {
+            System.out.println(list.get(i));
+        }
+    }
     public static Jedis getJedis() {
         //连接本地的 Redis 服务
         Jedis jedis = new Jedis("localhost");
-        jedis.auth("www1234");
         System.out.println("Connection to server sucessfully");
         //查看服务是否运行
         System.out.println("Server is running: "+jedis.ping());

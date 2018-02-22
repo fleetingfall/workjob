@@ -1,8 +1,11 @@
 package sparkDM.firstwork;
 
 import jodd.util.StringUtil;
+import kafka.admin.AdminUtils;
+import kafka.utils.ZkUtils;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.common.security.JaasUtils;
 
 import java.util.Properties;
 
@@ -11,6 +14,9 @@ import java.util.Properties;
  * 创造生产者
  */
 public class KafkaUtil {
+    static final String ZK_CONNNECT="master:2181,slave1:2181,slave2:2181";
+    static final int SESSION_TIMEOUT=30000;
+    static final int CONNECT_TIMEOUT=30000;
     /**
      * 获取kafka生产者实例
      * @param ip 服务器ip
@@ -59,5 +65,25 @@ public class KafkaUtil {
 
         KafkaConsumer<String,String>kafkaConsumer=new KafkaConsumer<String, String>(prop);
         return kafkaConsumer;
+    }
+
+    /**
+     * 新版本才可使用
+     */
+
+    public static void CreateTopic(String topic,int partion,int replica,Properties properties){
+      /*  ZkUtils zk=null;
+        try {
+            zk= ZkUtils.apply(ZK_CONNNECT,SESSION_TIMEOUT,CONNECT_TIMEOUT, JaasUtils.isZkSecurityEnabled());
+            if (!AdminUtils.topicExists(zk,topic)){
+                AdminUtils.createTopic(zk,topic,partion,replica,properties,AdminUtils.createTopic$default$6());
+            }else{
+                System.out.println("主题已经存在");
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            zk.close();
+        }*/
     }
 }

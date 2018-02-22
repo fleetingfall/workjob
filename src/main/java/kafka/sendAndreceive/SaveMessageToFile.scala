@@ -1,7 +1,6 @@
-package kafka
+package kafka.sendAndreceive
 
-import java.io.{File, FileWriter, PrintWriter}
-import java.util
+import java.io.{File, FileWriter}
 
 object SaveMessageToFile extends Serializable {
   def savemessage(file: File,context:String): Unit ={

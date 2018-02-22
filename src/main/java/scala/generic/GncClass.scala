@@ -76,6 +76,7 @@ object GncBoundU{
 /**
   * 视图界定：从必须是子类----->可以通过隐式转换可以转换成子类
   * 将会退出历史舞台，被类型约束替代
+  * T <% Comparable[T]  T 可以隐式转换成  Comparable[T]
   */
 object GncBoundView{
   /*Int 类型是不能调用的，因为Int没有继承自Comparable 但是界定之后就可以了  Int 隐式转换成了RichInt*/
@@ -101,4 +102,14 @@ object GncBoundType{
   def main(args: Array[String]): Unit = {
     println(new pair(100,1000).smaller)
   }
+}
+
+/**
+  * 上下文界定
+  */
+object ContextBount{
+  class Pair[T:Ordering](val first:T,val second:T){
+    def smaller(implicit ord:Ordering[T])=if(ord.compare(first,second)<0)first else second
+  }
+
 }
