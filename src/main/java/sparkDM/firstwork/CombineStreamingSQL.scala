@@ -40,7 +40,7 @@ object CombineStreamingSQL extends Job{
     val kafkaParams = Map(
       "metadata.broker.list" -> "master:9092"
     )
-    val topics = Set("ktp")
+    val topics = Set("longzhuresty2")
     /*查没有过期的用法是什么*/
     val inputrdd=KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](scc,kafkaParams,topics )
     val SQLContext=sparkSession.sqlContext

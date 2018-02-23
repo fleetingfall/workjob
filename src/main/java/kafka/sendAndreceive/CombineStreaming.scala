@@ -1,8 +1,8 @@
-package kafka
+package kafka.sendAndreceive
 
-import java.io.{File, FileWriter}
-import java.util
+import java.io.File
 
+import kafka.sendAndreceive.SaveMessageToFile
 import org.apache.spark.SparkConf
 import org.apache.spark.streaming.kafka.KafkaUtils
 import org.apache.spark.streaming.{Seconds, StreamingContext}

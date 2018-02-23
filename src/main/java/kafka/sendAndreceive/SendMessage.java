@@ -1,4 +1,4 @@
-package kafka;
+package kafka.sendAndreceive;
 
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
@@ -25,7 +25,7 @@ public class SendMessage {
 
         Producer<String, String> producer = new KafkaProducer<String,String>(props);
         for(int i = 0; i < 100000; i++) {
-            producer.send(new ProducerRecord<String, String>("web_log_event", Integer.toString(i), Integer.toString(i)));
+            producer.send(new ProducerRecord<String, String>("web2", Integer.toString(i), Integer.toString(i)));
             System.out.println("消息 "+i+" 已经被发送");
             try {
                 Thread.sleep(1000);

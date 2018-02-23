@@ -31,12 +31,12 @@ public class SendMessage {
         while (true){
             //消息躰,record的构造方法开可以再加一个参数，也就是第二个，是分区。
             String value=createMessage();
-            ProducerRecord<String,String> message=new ProducerRecord<>("ktp",String.valueOf(cnt),value);
+            ProducerRecord<String,String> message=new ProducerRecord<>("direcrDM",String.valueOf(cnt),value);
             producer.send(message);
             System.out.println(cnt);
             cnt++;
             try {
-                Thread.sleep(100);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

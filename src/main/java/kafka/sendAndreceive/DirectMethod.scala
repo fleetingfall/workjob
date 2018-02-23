@@ -1,4 +1,4 @@
-package kafka
+package kafka.sendAndreceive
 
 import java.util.{Date, Properties}
 

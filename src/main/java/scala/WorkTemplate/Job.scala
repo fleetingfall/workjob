@@ -4,7 +4,7 @@ import org.apache.spark.SparkConf
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.streaming.kafka.{HasOffsetRanges, KafkaUtils}
-import util.{ConfigUtil, Logging}
+import util.{Configration, Logging}
 
 import scala.collection.mutable
 
@@ -17,7 +17,7 @@ trait Job extends Logging{
   /*存储字符串类型的配置*/
   var configs = mutable.Map[String, String]()
 
-  def initJobConf(conf: String): mutable.Map[String, String] = ConfigUtil.readFile(conf)
+  def initJobConf(conf: String): mutable.Map[String, String] = Configration.readFile(conf)
 
   def getSparkSession(appName: String, parameters: Map[String, String] = Map()): SparkSession = {
     val sparkConf = new SparkConf()
