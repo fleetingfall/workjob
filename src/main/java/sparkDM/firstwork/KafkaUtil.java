@@ -27,7 +27,7 @@ public class KafkaUtil {
         Properties prop = new Properties();
         //推消息连接地址默认端口9092
         //prop.put("bootstrap.servers","master.hadoop:9092");
-        
+
         //bootstrap前端框架
         prop.put("bootstrap.servers",ip+":"+port);
         prop.put("acks", "0");
