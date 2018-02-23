@@ -77,8 +77,8 @@ object SimpleApp {
     // begin from the the offsets committed to the database
     val fromOffsets = DB.readOnly {implicit session =>
       s"select topic, part, offset from streaming_task where group_id=$group".
-        map { resultSet:ResultSet =>
-          new TopicAndPartition(resultSet.getString(1), resultSet.getInt(2)) -> resultSet.getLong(3)
+        map { resultSet =>
+          new TopicAndPartition(resultSet.String(1), resultSet.getInt(2)) -> resultSet.getLong(3)
         }.list.apply().toMap
     }
     val stream = createStream(fromOffsets, kafkaParams, conf, ssc, topics)
@@ -98,6 +98,7 @@ object SimpleApp {
     ssc
   }
 }
+
 object SetupJdbc {
   def apply(driver: String, host: String, user: String, password: String): Unit = {
     Class.forName(driver)

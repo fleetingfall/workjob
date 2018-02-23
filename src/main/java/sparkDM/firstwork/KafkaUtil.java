@@ -48,7 +48,7 @@ public class KafkaUtil {
 
     }
 
-    public static KafkaConsumer<String,String> getConsumer(String ip,int port){
+    public static KafkaConsumer<String,String> getConsumer(String ip,int port,String autoCommit){
         if(StringUtil.isEmpty(ip)||port<0){
             return null;
         }
@@ -57,8 +57,15 @@ public class KafkaUtil {
         prop.put("bootstrap.servers",ip+":"+port);
 
         prop.put("group.id", "12");
-        prop.put("enable.auto.commit", "true");
-        prop.put("auto.commit.interval.ms", "1000");
+        //是否自动提交
+        prop.put("enable.auto.commit", autoCommit);
+        //多长事件提交一次offset
+        if (autoCommit.equals("true")){
+            System.out.println("offset 提交时间间隔未设置");
+        }else {
+            prop.put("enable.auto.commit", "true");
+            prop.put("auto.commit.interval.ms", "1000");
+        }
         prop.put("session.timeout.ms", "30000");
         prop.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         prop.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");

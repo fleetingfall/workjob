@@ -17,6 +17,16 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.typesafe.akka</groupId>
+            <artifactId>akka-actor_2.11</artifactId>
+            <version>2.5.6</version>
+        </dependency>
+        <dependency>
+            <groupId>com.typesafe.akka</groupId>
+            <artifactId>akka-cluster_2.11</artifactId>
+            <version>2.5.6</version>
+        </dependency>
+        <dependency>
             <groupId>org.scalikejdbc</groupId>
             <artifactId>scalikejdbc-config_2.11</artifactId>
             <version>3.0.0</version>

@@ -15,7 +15,7 @@ import java.util.Arrays;
 
 public class GetMessage {
     public static void main(String[] args) throws Exception {
-        KafkaConsumer<String, String> consumer = KafkaUtil.getConsumer("tencent",9092);
+        KafkaConsumer<String, String> consumer = KafkaUtil.getConsumer("tencent",9092,"true");
         consumer.subscribe(Arrays.asList("kingcall"));
         consumer.seekToBeginning(new ArrayList<>());
         while (true) {

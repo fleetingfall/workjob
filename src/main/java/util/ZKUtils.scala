@@ -17,7 +17,7 @@ import scala.collection.{Seq, mutable}
   * ZkClient是由Datameer的工程师开发的开源客户端，对Zookeeper的原生API进行了包装，实现了超时重连、Watcher反复注册等功能。
   * kafka本身就有一套关于zk的工具类 kafka.utils.{VerifiableProperties, ZKConfig, ZKGroupTopicDirs, ZkUtils}
   *
-  * 这个工具类
+  * 这个工具类 借助了kafka本身的zkutils
   */
 object ZKUtils extends Serializable with Logging {
   def createZKClient(zkQuorum: String): ZkClient = {

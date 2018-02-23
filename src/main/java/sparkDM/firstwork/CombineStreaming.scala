@@ -142,6 +142,8 @@ object CombineStreaming {
 
   /**
     *有消费组信息，但是发现但是发现offset节点下并没有对应主题的offset值，而且存在着随机现象
+    * 测试高阶API 对offset的维护
+    * 发现并没有去维护，从最新的offset去读 也就是说没有发送的时候消费之没有办法读到数据
     */
   def offsetAboutAuto(): Unit ={
     val input=KafkaUtils.createStream(scc,zkQuorum,"kingcall_gp" ,Map("lk" -> 1),StorageLevel.MEMORY_ONLY)
