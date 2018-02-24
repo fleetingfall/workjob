@@ -11,7 +11,7 @@ object HelloWorld2 extends App {
   val system = ActorSystem("actor-demo-scala")
 
   /**
-    * 注意一下这里的props和以往的不一样，而是一个方法，但是返回的是一个Props对象
+    * 注意一下这里的props和以往的不一样，而是一个方法，但是返回的是一个Props对象 ————页就是工厂方法
     *
     * 下面是用同一个类创建的两个不同的对象
     *

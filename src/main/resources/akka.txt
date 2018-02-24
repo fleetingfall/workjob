@@ -1,0 +1,10 @@
+akka {
+    actor {
+        provider = akka.remote.RemoteActorRefProvider
+        deployment {
+            /Greeter {
+                remote =akka://MySystem@master:2552
+            }
+        }
+    }
+}

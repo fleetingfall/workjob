@@ -10,6 +10,8 @@ import scala.concurrent.{Await, Future, Promise}
 import scala.language.postfixOps
 import scala.util.{Failure, Random, Success}
 
+import scala.concurrent.duration._
+
 /**
   * future是用来获取同步操作结果的
   * Future提供了一套高效便捷的非阻塞并行操作管理方案。其基本思想很简单，所谓Future，指的是一类占位符对象，用于指代某些尚未完成的计算的结果
@@ -20,7 +22,7 @@ object FunD  {
   def main(args: Array[String]): Unit = {
     /*hello.start()*/
     /*(new NetworkService2(2020, 2)).run*/
-    teDM2
+    teDM2()
 
   }
   def teDM(): Unit ={
@@ -29,7 +31,9 @@ object FunD  {
       println("我等了1s")
     }
     println("我是主函数")
+    //位了让主线程等待子线程完成
     Thread.sleep(10*1000)
+
   }
   def teDM2(): Unit ={
     val f = Future{ 1 + 2 }
@@ -39,7 +43,7 @@ object FunD  {
         case Failure(t) => println("failed: " + t.getMessage)
       } }
     //等待任务结束
- /*   Await.ready(f, 10 second)*/
+    Await.ready(f, 10 second)
 
   }
 

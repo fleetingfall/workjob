@@ -11,7 +11,7 @@ object HelloWorld extends App {
   case class Greet(name: String)
 
   val system = ActorSystem("actor-demo-scala")
-  //Props(new Hello) 什么时候用[]  什么时候用（）
+  //Props(new Hello) 什么时候用[]  什么时候用（）  第一个参数是配置文件   第二个参数是Actor的名字  获得是一个Actor的引用
   val hello = system.actorOf(Props[Hello], "hello")
   hello ! Greeting("Hello")
   hello ! Greet("Bob")
