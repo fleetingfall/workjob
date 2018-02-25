@@ -3,6 +3,7 @@ package util;
 import constant.JedisPooLConf;
 import redis.clients.jedis.*;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -10,7 +11,7 @@ import java.util.Set;
 /**
  * Jedis是 Redis java 版本的客户端，提供了完整Redis命令（命令行例一模一样的命令），而Redisson有更多分布式的容器实现。
  */
-public class JedisDM {
+public class JedisDM implements Serializable {
 
     public static void main(String[] args) {
         showInfo();
